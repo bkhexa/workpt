@@ -155,9 +155,13 @@ def analyze_article(token, article_text):
             response.raise_for_status()
 
             json_res = response.json()
-            if 'choices' in json_res:
+            if 'choices' in json_res and 'message' in json_res['choices'][0]:
                 answer = json_res['choices'][0]['message']['content']
-                return json.loads(answer)
+                try:
+                    return json.loads(answer)
+                except json.JSONDecodeError as e:
+                    logging.error(f"Failed to parse JSON from answer: {e}. Answer: {answer}")
+                    return None
             else:
                 logging.error("The 'choices' key is missing from the API response.")
                 return None
