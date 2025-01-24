@@ -45,3 +45,36 @@ text read
             df = pd.DataFrame(parsed_data)
             exploded_df = df.explode("urls").reset_index(drop=True)
             exploded_df = exploded_df[exploded_df["urls"].notna()]
+
+
+
+
+
+df into table
+
+            def insert_dataframe_to_table(df,conn):
+                table_name = "company_master_details"
+                company_short_name = "unknown"
+                try:
+                    # Prepare the insert query
+                    insert_query = f"""
+                        INSERT INTO {table_name} (company_name,company_short_name, company_id)
+                        VALUES (%s, %s,%s)
+                        ON CONFLICT (company_id) DO NOTHING;
+                    """
+                    
+                    # Connect to the database
+                    cursor = conn.cursor()
+                    
+                    # Iterate over DataFrame rows
+                    for _, row in df.iterrows():
+                        cursor.execute(insert_query, (row["company_name"], row["company_id"]))
+                    
+                    # Commit the transaction
+                    conn.commit()
+                    print("Data inserted successfully.")
+                except Exception as e:
+                    print(f"Error: {e}")
+                    conn.rollback()  # Rollback in case of error
+                finally:
+                    cursor.close()
