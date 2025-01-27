@@ -96,3 +96,44 @@ df into table
             - Provided in the exact format specified above.
             - If any field does not have enough data in the article, mention it as "Not Applicable".
             """
+
+
+
+            format_str = """
+            {
+                "Company Name": "[Company Name mentioned in the article (e.g., Ligado Networks, Inmarsat)]",
+                "Article Title": "[Full title of the news article]",
+                "Article Published Timestamp in PT": "[MM/dd/yyyy HH:mm:ss a (convert timestamp to PT if available)]",
+                "Article Modified Timestamp in PT": "[MM/dd/yyyy HH:mm:ss a (convert to PT if modified timestamp is available)]",
+                "Article News Source": "[Name of the source (e.g., SpaceNews)]",
+                "Article Summary": "[A concise summary of the article's main points in 2-3 sentences]",
+                "Sentiment Score": {
+                    "Value": "[Numerical sentiment score (based on -10 to 10)]",
+                    "Reference": "[Provide the specific sentence or section from the article that supports this sentiment score]"
+                },
+                "Sentiment Score Reasoning": {
+                    "Reasoning": "[Reasoning behind the sentiment score, e.g., positive developments, lawsuits, etc.]",
+                    "Reference": "[Provide the specific sentence or section from the article that supports this reasoning]"
+                },
+                "Company Valuation Significance": {
+                    "Value": "[High/Medium/Low]",
+                    "Reference": "[Provide the specific sentence or section from the article that justifies this value]"
+                },
+                "Company Valuation Significance Reasoning": {
+                    "Reasoning": "[Explain why the event impacts the company's valuation significantly or not]",
+                    "Reference": "[Provide the specific sentence or section from the article that supports this reasoning]"
+                },
+                "Explicit Company Impacts": {
+                    "Impacts": "[Specific impacts on the company, such as lawsuits, partnerships, market reactions]",
+                    "Reference": "[Provide the specific sentence or section from the article that describes these impacts]"
+                },
+                "Implicit Industry Impacts": {
+                    "Impacts": "[Potential impacts on the broader industry, if applicable, based on the event]",
+                    "Reference": "[Provide the specific sentence or section from the article that describes these industry impacts]"
+                },
+                "Implicit Impact Peer Companies": {
+                    "Companies": "[List of peer companies potentially impacted by the event]",
+                    "Reference": "[Provide the specific sentence or section from the article that mentions or suggests these peer companies]"
+                }
+            }
+            """
