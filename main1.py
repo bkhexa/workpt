@@ -24,6 +24,7 @@ logging.basicConfig(
 
 # Configuration flag to toggle between API and text file processing
 USE_PRODUCTION_API = True  # Set to True for production API, False for text file
+USE_GIVEN_COMPANY = True
 
 load_dotenv()
 DB_HOST = os.getenv("DB_HOST")
@@ -395,8 +396,115 @@ def main_api():
         if conn:
             conn.close()
             logging.info("Database connection closed.")
-            
-   
+
+
+
+
+def main_api_custom():
+    conn = connect_to_db()
+    if not conn:
+        logging.error("Exiting: Database connection could not be established.")
+        return
+
+    try:
+
+        company_names = ["CompanyA", "CompanyB", "CompanyC"]
+        cursor = conn.cursor()
+        for company_name in company_names:
+            cursor.execute("""
+                SELECT company_name FROM prod_table WHERE company_name = %s
+            """, (company_name,))
+            if cursor.fetchone() is None:
+                cursor.execute("""
+                    INSERT INTO prod_table (company_name)
+                    VALUES (%s)
+                """, (company_name)) 
+                conn.commit()
+                logging.info(f"Inserted company name '{company_name}' into prod_table.")
+
+        # Step 2: Fetch company IDs for company names without IDs
+        cursor.execute("""
+            SELECT company_name FROM prod_table WHERE company_id IS NULL
+        """)
+        companies_to_update = cursor.fetchall()
+
+        for row in companies_to_update:
+            company_name = row[0]
+
+            # Fetch company ID from the API
+            response = requests.get(BASE_URL_ENTITIES, headers=HEADERS)
+            response.raise_for_status()
+            companies_data = response.json()
+
+            company_id = None
+            for company in companies_data.get("companies", []):
+                if company.get("companyName") and company.get("companyName").strip() == company_name:
+                    company_id = company.get("companyid")
+                    break
+
+            if company_id:
+                # Update company ID in the database
+                cursor.execute("""
+                    UPDATE prod_table
+                    SET company_id = %s
+                    WHERE company_name = %s
+                """, (company_id, company_name))
+                conn.commit()
+                logging.info(f"Updated company ID for '{company_name}' in prod_table.")
+            else:
+                logging.warning(f"No company ID found for '{company_name}'. Skipping.")
+
+        # Step 3: Continue with the rest of the existing code logic
+        cursor.execute("""
+            SELECT company_name, company_id FROM prod_table WHERE company_id IS NOT NULL
+        """)
+        companies_with_ids = cursor.fetchall()
+
+        for company_name, company_id in companies_with_ids:
+            try:
+                news_response = requests.get(BASE_URL_ENTITIES.format(company_id), headers=HEADERS)
+                news_response.raise_for_status()
+                news_data = news_response.json()
+                for article in news_data:
+                    company_url = article.get("url")
+                    article_data = fetch_and_clean_article(company_url)
+                    if not article_data:
+                        logging.warning("Primary method failed, trying with playwright.")
+                        article_data = asyncio.run(fetch_and_clean_article_pr(company_url))
+                        if not article_data:
+                            log_error(conn, "Scraping Error", "Failed to fetch article text", company_url)
+                            continue
+                    token = get_token()
+                    if not token:
+                        log_error(conn, "Authentication Error", "Failed to fetch token", company_url)
+                        continue
+                    analysis = analyze_article(token, article_data["text"])
+                    if not analysis:
+                        log_error(conn, "Analysis Error", f"Failed to analyze article with company_url: {company_url}", company_url)
+                        continue
+                    data = (
+                        company_id, company_url, article_data["title"], article_data["text"],
+                        analysis.get("Article Summary"), 'TBD', analysis.get("Sentiment Score"),
+                        analysis.get("Sentiment Score Reasoning"),
+                        json.dumps(analysis),
+                        datetime.now(), datetime.now(),
+                        analysis.get("Company Valuation Significance"), analysis.get("Company Valuation"),
+                        analysis.get("Explicit Company Impacts"), analysis.get("Implicit Industry Impacts"),
+                        datetime.now(), 1
+                    )
+                    insert_into_article_table(conn, data)
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Error fetching news data for company ID {company_id}: {e}")
+                log_error(conn, "API Request Error", str(e), company_id)
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching company data from API: {e}")
+        log_error(conn, "API Request Error", str(e), None)
+    finally:
+        if conn:
+            conn.close()
+            logging.info("Database connection closed.")
+
            
 ############## Main function for Production URL's data fetching and processing - from txt file # ######
 
@@ -529,44 +637,16 @@ def main_text():
     
 if __name__ == "__main__":
     if USE_PRODUCTION_API:
-        logging.info("Running the main function for production API.")
-        main_api()
+        if USE_GIVEN_COMPANY:
+            logging.info("Running the main function for production API with given company names.")
+            main_api_custom()
+        else:
+            logging.info("Running the main function for production API.")
+            main_api()
+        
     else:
         logging.info("Running the main function for text file processing.")
         main_text()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import requests
-url = ""
-headers = {
-    "Authorization": ""
-}
-
-response = requests.get(url, headers=headers)
-data = response.json()
-
-target_name = "Raymond Loewy International"
-company_details = [
-    company for company in data.get("companies", []) if company["companyName"] == target_name]
-
-if company_details:
-    print("Company Found:", company_details[0])
-else:
-    print("Company not found.")
 
 
 
