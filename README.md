@@ -78,3 +78,21 @@ df into table
                     conn.rollback()  # Rollback in case of error
                 finally:
                     cursor.close()
+
+
+
+
+            content = f"""
+            I own an investment in one of the companies mentioned in the news article. Based on the article content provided below, analyze it and provide the output in the exact dictionary format outlined below:
+            
+            {format_str}
+            
+            News Article Content:
+            {article_text}
+            
+            Please ensure the analysis is:
+            - Factually accurate and aligned with the article content.
+            - Contextually relevant to investment and business implications.
+            - Provided in the exact format specified above.
+            - If any field does not have enough data in the article, mention it as "Not Applicable".
+            """
