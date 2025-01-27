@@ -107,10 +107,7 @@ df into table
                 "Article Modified Timestamp in PT": "[MM/dd/yyyy HH:mm:ss a (convert to PT if modified timestamp is available)]",
                 "Article News Source": "[Name of the source (e.g., SpaceNews)]",
                 "Article Summary": "[A concise summary of the article's main points in 2-3 sentences]",
-                "Sentiment Score": {
-                    "Value": "[Numerical sentiment score (based on -10 to 10)]",
-                    "Reference": "[Provide the specific sentence or section from the article that supports this sentiment score]"
-                },
+                "Sentiment Score": "[Numerical sentiment score (based on -10 to 10)]",
                 "Sentiment Score Reasoning": {
                     "Reasoning": "[Reasoning behind the sentiment score, e.g., positive developments, lawsuits, etc.]",
                     "Reference": "[Provide the specific sentence or section from the article that supports this reasoning]"
