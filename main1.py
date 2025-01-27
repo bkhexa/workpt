@@ -514,3 +514,59 @@ if __name__ == "__main__":
     else:
         logging.info("Running the main function for text file processing.")
         main_text()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def is_javascript_disabled(content):
+    javascript_disabled_keywords = [
+        "JavaScript is disabled",
+        "Please enable JavaScript",
+        "This site requires JavaScript",
+        "Your browser does not support JavaScript",
+        "enable JavaScript",
+        "JavaScript has been disabled",
+    ]
+    
+    for keyword in javascript_disabled_keywords:
+        if keyword.lower() in content.lower():
+            return True
+    return False
+
+
+
+
+if is_javascript_disabled(article_text):
+    logging.warning(f"JavaScript is disabled for URL: {company_url}")
+    return {"title": title, "text": "JavaScript is disabled. Retry with Playwright or enable JavaScript."}
+
+
+
+if is_javascript_disabled(text):
+    logging.warning(f"JavaScript is disabled for URL: {company_url}")
+    return {"title": title, "text": "JavaScript is disabled. Retry with JavaScript enabled."}
