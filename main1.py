@@ -72,6 +72,20 @@ def log_error(conn, error_message, error_type, related_item):
         cursor.close()
     except Exception as e:
         logging.error(f"Failed to log error: {e}")
+def is_javascript_disabled(content):
+    javascript_disabled_keywords = [
+        "JavaScript is disabled",
+        "Please enable JavaScript",
+        "This site requires JavaScript",
+        "Your browser does not support JavaScript",
+        "enable JavaScript",
+        "JavaScript has been disabled",
+    ]
+    
+    for keyword in javascript_disabled_keywords:
+        if keyword.lower() in content.lower():
+            return True
+    return False
 
 # Fetch and clean article using BeautifulSoup and newspaper3k
 def fetch_and_clean_article(company_url):
@@ -85,6 +99,9 @@ def fetch_and_clean_article(company_url):
             title= article.title if article.title else "No Article"
             article_html = article.html
             article_text = article.text
+            if is_javascript_disabled(article_text):
+                logging.warning(f"JavaScript is disabled for URL: {company_url}")
+                return {"title": title, "text": "JavaScript is disabled. Retry with Playwright or enable JavaScript."}
             soup= BeautifulSoup(article_html, 'html.parser')
             for tag in soup([' script' , 'style' , 'font', 'header', 'footer', 'aside' , 'nav' , ' advertisement' ] ):
                 tag.decompose()
@@ -117,6 +134,9 @@ async def fetch_and_clean_article_pr(company_url):
             soup = BeautifulSoup(content, "html.parser")
             title = soup.title.string or "No Title"
             text = " ".join(p.get_text().strip() for p in soup.find_all("p"))
+            if is_javascript_disabled(text):
+                logging.warning(f"JavaScript is disabled for URL: {company_url}")
+                return {"title": title, "text": "JavaScript is disabled. Retry with JavaScript enabled."}
             return {"title": title, "text": text.strip()}
     except Exception as e:
         logging.error(f"Playwright error fetching URL {company_url}: {e}")
@@ -530,6 +550,23 @@ if __name__ == "__main__":
 
 
 
+import requests
+url = ""
+headers = {
+    "Authorization": ""
+}
+
+response = requests.get(url, headers=headers)
+data = response.json()
+
+target_name = "Raymond Loewy International"
+company_details = [
+    company for company in data.get("companies", []) if company["companyName"] == target_name]
+
+if company_details:
+    print("Company Found:", company_details[0])
+else:
+    print("Company not found.")
 
 
 
@@ -543,30 +580,10 @@ if __name__ == "__main__":
 
 
 
-def is_javascript_disabled(content):
-    javascript_disabled_keywords = [
-        "JavaScript is disabled",
-        "Please enable JavaScript",
-        "This site requires JavaScript",
-        "Your browser does not support JavaScript",
-        "enable JavaScript",
-        "JavaScript has been disabled",
-    ]
-    
-    for keyword in javascript_disabled_keywords:
-        if keyword.lower() in content.lower():
-            return True
-    return False
 
 
 
 
-if is_javascript_disabled(article_text):
-    logging.warning(f"JavaScript is disabled for URL: {company_url}")
-    return {"title": title, "text": "JavaScript is disabled. Retry with Playwright or enable JavaScript."}
 
 
 
-if is_javascript_disabled(text):
-    logging.warning(f"JavaScript is disabled for URL: {company_url}")
-    return {"title": title, "text": "JavaScript is disabled. Retry with JavaScript enabled."}
