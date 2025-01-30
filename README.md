@@ -241,14 +241,19 @@ prompt version 2
             ---
             
             ### **Analysis Section**
-            1. **Why is the BERT Score `{bert_score}` for this generated summary?**  
+            1. **Why is the BERT Score for this generated summary?**  
                - Identify key phrases that match and highlight deviations.
                - Explain whether the generated summary maintains meaning.
+               - **Explain it in layman’s terms:**  
+                 - *Does the generated summary "mean the same thing" as the reference summary, even if different words are used?*
+                 - *Would an average person get the same understanding from both summaries?*
             
-            2. **Why is the Accuracy Score `{accuracy_score}` for this generated summary?**  
+            2. **Why is the Accuracy Score for this generated summary?**  
                - Analyze the correctness of details in `{generateddata}` compared to `{refdata}`.
                - Mention whether the generated summary missed or added any critical details.
-               
+               - **Explain it in layman’s terms:**  
+                 - *If someone only read the generated summary, would they still know the key facts?*
+                 - *Are any important details missing or changed that might confuse a reader?*
             ---
             
             ### **Guidelines:**
