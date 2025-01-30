@@ -264,6 +264,31 @@ prompt version 2
 
 
 
+streamlit error
+
+            st.markdown(
+                """
+                <style>
+                .text-box {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    border-radius: 5px;
+                    background-color: #f9f9f9;
+                    max-width: 800px;
+                    word-wrap: break-word;
+                    white-space: normal;
+                    overflow: auto;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            
+            st.markdown(f'<div class="text-box">{st.session_state.downloaddata}</div>', unsafe_allow_html=True)
+            
+
 
 
 
