@@ -134,3 +134,49 @@ df into table
                 }
             }
             """
+
+prompt for score calculation
+
+            
+            prompt = f"""
+            Evaluate the generated summary `{generateddata}` against the reference summary `{refdata}` using two key metrics: **Perplexity** and **Accuracy**. 
+            
+            ### Instructions:
+            - Provide numerical scores for both metrics.
+            - Present the results in a **table format**.
+            - Summarize the findings concisely below the table.
+            
+            ### Definitions:
+            1. **Perplexity**: Measures how well a probability model predicts a sample. Lower values indicate better predictions.
+            2. **Accuracy**: Measures the percentage of correct predictions. Higher values indicate better performance.
+            
+            ### Expected Output Format:
+            
+            | Metric       | Score | Explanation |
+            |-------------|-------|-------------|
+            | Perplexity  | X.XX  | How well the generated summary aligns with the reference summary. |
+            | Accuracy    | X.XX  | The percentage of correct predictions compared to the reference summary. |
+            
+            ### Additional Insights:
+            1. **Explain why the Perplexity score is `{perplexity_score}` based on the relationship between `{refdata}` and `{generateddata}`.**
+            2. **Explain why the Accuracy score is `{accuracy_score}` based on the comparison of `{refdata}` and `{generateddata}`.**
+            
+            Ensure that the explanations are concise and directly related to the scores provided.
+            """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
