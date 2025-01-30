@@ -172,6 +172,39 @@ prompt for score calculation
 
 
 
+prompt with bertscore and accuracy
+
+
+
+            prompt = f"""
+            Evaluate the **Generated Summary** `{generateddata}` against the **Reference Summary** `{refdata}` using the following two metrics:
+            
+            1. **BLEU Score** - A measure of how similar the generated summary is to the reference summary. A **higher BLEU score** (0-100) indicates a better match.
+            2. **Accuracy** - Measures the percentage of correct words/phrases in the generated summary compared to the reference summary. A **higher accuracy score** means better alignment.
+            
+            ### **Instructions:**
+            - Compute and provide **numerical scores** for **BLEU Score** and **Accuracy**.
+            - Present the results in a **table format**.
+            - After the table, explain how these scores were determined.
+            - Keep explanations concise and relevant to `{refdata}` and `{generateddata}`.
+            
+            ---
+            
+            ### **Expected Output Format:**
+            
+            | Metric      | Score | Explanation |
+            |------------|-------|-------------|
+            | BLEU Score | X.XX  | Explanation of how well the generated summary aligns with the reference summary. |
+            | Accuracy   | X.XX  | Explanation of how well the generated summary matches the reference summary. |
+            
+            ### **Additional Analysis:**
+            1. **Explain why the BLEU score is `{bleu_score}` for this generated summary.**
+            2. **Explain why the Accuracy score is `{accuracy_score}` for this generated summary.**
+            
+            ---
+            
+            Ensure that the responses are structured, precise, and based on the comparison between `{refdata}` and `{generateddata}`.
+            """
 
 
 
