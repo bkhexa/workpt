@@ -211,5 +211,55 @@ prompt with bertscore and accuracy
 
 
 
+prompt version 2
+
+            prompt = f"""
+            You are an NLP evaluation expert. Your task is to compare the **Generated Summary** and **Reference Summary** based on their semantic similarity and accuracy.
+            ### **Reference Summary**:
+            {refdata}
+            ### **Generated Summary**:
+            {generateddata}
+                        
+            ### **Instructions:**
+            1. **Compute the following evaluation metrics based on the given summaries:**
+               - **BERT Score** (range: 0 to 1) → Measure the deep contextual similarity between the reference and generated summary.
+               - **Accuracy Score** (range: 0 to 100) → Determine how closely the generated summary matches the reference summary in terms of key information and structure.
+            
+            2. **Provide the results in a structured format:**
+               - Display the computed scores in a table.
+               - Explain how each score was derived based on the actual content.
+            
+            ---
+
+            ### **Expected Output Format:**
+            
+            | Metric      | Score | Explanation |
+            |------------|-------|-------------|
+            | BERT Score | X.XX  | Justification based on key phrase similarity and semantic overlap. |
+            | Accuracy   | X.XX  | Explanation considering word overlap, missing details, or extra information. |
+            
+            ---
+            
+            ### **Analysis Section**
+            1. **Why is the BERT Score `{bert_score}` for this generated summary?**  
+               - Identify key phrases that match and highlight deviations.
+               - Explain whether the generated summary maintains meaning.
+            
+            2. **Why is the Accuracy Score `{accuracy_score}` for this generated summary?**  
+               - Analyze the correctness of details in `{generateddata}` compared to `{refdata}`.
+               - Mention whether the generated summary missed or added any critical details.
+               
+            ---
+            
+            ### **Guidelines:**
+            - **Use actual content** of `{refdata}` and `{generateddata}` to compute the scores.
+            - **Avoid generic descriptions**—base all responses on real comparisons.
+            - **Provide meaningful justifications** for both scores.
+            """
+
+
+
+
+
 
             
