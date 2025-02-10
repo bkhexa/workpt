@@ -667,3 +667,56 @@ if __name__ == "__main__":
 
 
 
+
+    metadata = {}
+    for meta in soup.find_all("meta"):
+        if meta.get("property") in ["article:published_time", "article:modified_time", "og:updated_time", "og:published_time"]:
+            metadata[meta.get("property")] = meta.get("content")
+        if meta.get("name") in ["datePublished", "dateModified"]:
+            metadata[meta.get("name")] = meta.get("content")
+    
+    json_ld_data = soup.find("script", type="application/ld+json")
+    if json_ld_data:
+        try:
+            json_data = json.loads(json_ld_data.string)
+            if isinstance(json_data, list):
+                json_data = json_data[0]  
+            if "datePublished" in json_data:
+                metadata["datePublished"] = json_data["datePublished"]
+            if "dateModified" in json_data:
+                metadata["dateModified"] = json_data["dateModified"]
+        except json.JSONDecodeError:
+            pass
+    
+    time_tags = soup.find_all("time")
+    for time_tag in time_tags:
+        if time_tag.get("data-dt"): 
+            metadata["timestamp_data_dt"] = time_tag.get("data-dt")
+        if "jsdtTime" in time_tag.get("class", []): 
+            metadata["visible_time"] = time_tag.text.strip()
+        if time_tag.get("datetime"): 
+            metadata["time_datetime"] = time_tag.get("datetime")
+            
+    page_text = soup.get_text()
+    date_match = re.search(r'\b(\d{4}-\d{2}-\d{2}|\d{1,2} \w+ \d{4},? \d{1,2}:\d{2} [APM]{2} \w{3})\b', page_text)
+    if date_match:
+        metadata["extracted_date"] = date_match.group(0)
+    
+    article_body = soup.find("div", id="article-body")
+    teaser_div = soup.find("div", id="teaser")
+    text = (article_body.text if article_body else '') + (teaser_div.text if teaser_div else '')
+    
+    date_match = re.search(r'\b(\w+ \d{1,2},\s*\d{4},?\s*\d{1,2}:\d{2}\s*[APM]{2}\s*\w{3})\b', text)
+    if date_match:
+        metadata["article_date"] = date_match.group(0)
+
+
+
+
+
+
+
+
+
+
+
